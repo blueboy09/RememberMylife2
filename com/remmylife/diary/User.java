@@ -15,6 +15,8 @@ public class User {
 
 	public void init(){
 		this.userID=0;
+		this.sex=Sex.male;
+		this.birthday = new Date(); 
 	}
 	public User() {
 		super();

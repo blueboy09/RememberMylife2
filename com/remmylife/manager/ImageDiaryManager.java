@@ -40,11 +40,9 @@ public class ImageDiaryManager extends DiaryManager {
 				
 			try{
 				java.sql.Connection con = DriverManager.getConnection(this.url,this.user,this.password);
-				java.sql.PreparedStatement pS = con.prepareStatement("insert into `imagelist`(id,note,imagedata) values ('"
+				java.sql.PreparedStatement pS = con.prepareStatement("insert into `imagelist`(diaryid,note,imagedata) values ('"
 						+ id +"', '"+ note +"', ?);");
 									
-				//File imgFile = new File("d:\\d.jpg");
-				//InputStream iS = new FileInputStream(imgFile);
 				InputStream iS= new ByteArrayInputStream(images);
 				pS.setBinaryStream(1, iS,(int)(images.length));
 				pS.executeUpdate();
@@ -55,19 +53,25 @@ public class ImageDiaryManager extends DiaryManager {
 				return false;
 			}
 		}else{
-			deleteself(diary);
 			try{
 				java.sql.Connection con = DriverManager.getConnection(this.url,this.user,this.password);
-				java.sql.PreparedStatement pS = con.prepareStatement("insert into `imagelist`(id,note,imagedata) values ('"
-						+ id +"', '"+ note +"', ?);");
-									
-				//File imgFile = new File("d:\\d.jpg");
-				//InputStream iS = new FileInputStream(imgFile);
-				InputStream iS= new ByteArrayInputStream(images);
-				pS.setBinaryStream(1, iS,(int)(images.length));
-				pS.executeUpdate();
-				
-				return true;
+				String update;
+				if(images!=null){
+
+					update="update `imagelist` SET `diaryid` ='"+id+"',`note`='"+note+"', `imagedata` = ?;";
+					java.sql.PreparedStatement pS = con.prepareStatement(update);
+					//java.sql.PreparedStatement pS = con.prepareStatement("insert into `imagelist`(id,note,imagedata) values ('"+ id +"', '"+ note +"', ?);");
+					InputStream iS= new ByteArrayInputStream(images);
+					pS.setBinaryStream(1, iS,(int)(images.length));
+					pS.executeUpdate();
+					return true;
+				}else{
+					update="update `imagelist` SET `diaryid` ='"+id+"',`note`='"+note+"';";
+					java.sql.PreparedStatement pS = con.prepareStatement(update);
+					pS.executeUpdate();
+					return true;
+				}
+
 			}catch(SQLException e) {
 				e.printStackTrace();
 				return false;
@@ -122,8 +126,11 @@ public class ImageDiaryManager extends DiaryManager {
 			
 			if(rS.next()){
 				java.sql.Blob blob = rS.getBlob("imagedata");
-				byte[]image= blob.getBytes(1, (int) blob.length());
-				dataManager.disconnectFromDatabase();
+				byte[] image=null;
+				if(blob!=null){
+					image= blob.getBytes(1, (int) blob.length());
+					dataManager.disconnectFromDatabase();
+				}
 				return new ImageDiary(diary,image,note);
 			}else{
 				return null;
@@ -137,33 +144,28 @@ public class ImageDiaryManager extends DiaryManager {
 	}
 	
 	public ArrayList<Diary> searchByContent(String content, User self, boolean own){ 
-		String query="Select * from imagelist where `note` like \"%"+ content +"%\"";
+		String query="Select * from diarylist NATURAL LEFT OUTER JOIN imagelist where `note` like \"%"+ content +"%\"";
 		String listown=query+" and `userid`="+ self.getUserID();
 		String listshare = query + " and `shared` = 1 and `userid`<>"+ self.getUserID();
 		
 		ArrayList<Diary> diaryList = new ArrayList<Diary>();
 		try {
 			dataManager.connectToDatabase();
+			
 			if(own==true){
 				dataManager.setQuery(listown);
-				int numberOfRow= dataManager.getRowCount();
-				for(int i = 0; i<numberOfRow; i++){
-					TextDiary diary = new TextDiary();
-					diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
-					diaryList.add(diary);
-				}
-				dataManager.disconnectFromDatabase();
+			
 			}else{
-				dataManager.setQuery(listshare);
-				int numberOfRow= dataManager.getRowCount();
-				for(int i =0; i<numberOfRow; i++){
-					TextDiary diary = new TextDiary();
-					diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
-					diaryList.add(diary);
-				}
-				dataManager.disconnectFromDatabase();
+				dataManager.setQuery(listshare);		
 			}
 			
+			int numberOfRow= dataManager.getRowCount();
+			for(int i = 0; i<numberOfRow; i++){
+				ImageDiary diary = new ImageDiary();
+				diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
+				diaryList.add(diary);
+			}
+			dataManager.disconnectFromDatabase();
 		} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 		}
@@ -184,9 +186,11 @@ public class ImageDiaryManager extends DiaryManager {
 				java.sql.PreparedStatement pS = con.prepareStatement("SELECT * FROM imagelist where id ="+diary.getId());
 				ResultSet rS = pS.executeQuery();
 				if(rS.next()){
-					java.sql.Blob blob2 = rS.getBlob("imagedata");
-					byte[]image= blob2.getBytes(1, (int) blob2.length());
-					diaryList.add(new ImageDiary(diary,image,note));
+					java.sql.Blob blob = rS.getBlob("imagedata");
+					if(blob!=null){
+						byte[]image= blob.getBytes(1, (int) blob.length());
+						diaryList.add(new ImageDiary(diary,image,note));
+					}
 				}
 				
 			} catch (IllegalStateException | SQLException e) {

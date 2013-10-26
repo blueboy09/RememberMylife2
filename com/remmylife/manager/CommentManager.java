@@ -36,9 +36,9 @@ public class CommentManager extends Manager {
 		int userid = comment.getUserid();
 		String content = comment.getContent();
 		//String savecomment2= "insert into `commentlist`(`commentid`,`diaryid`,`userid`,`content`) values ('"+commentid+"', '"+ diaryid+"', '" + userid +"', '"+content+");" ;
-		String savecomment="insert into `commentlist`(`diaryid`,`userid`,`content`) values ('"
-				+ diaryid+"', '" + userid +"', '"+content+");" ;
-		String updatecomment = "update `commentlist` SET `diaryid` ="+ diaryid +", `userid`="+userid+", `content`= "+content+" ;";
+		String savecomment="insert into `commentlist`(`userid`,`diaryid`,`content`) values ('"
+				+ userid+"', '" + diaryid +"', '"+content+"');" ;
+		String updatecomment = "update `commentlist` SET `userid` ="+ userid +", `diaryid`="+diaryid+", `content`= '"+content+"' ;";
         if(commentid==0){
         	try {
 				dataManager.setUpdate(savecomment);
@@ -104,12 +104,11 @@ public class CommentManager extends Manager {
 			String ts = dataManager.getValueAt(i,0).toString();
 			comment.setCommentid(Integer.valueOf(ts));
 
-			String ds = dataManager.getValueAt(i,1).toString();
-			comment.setDiaryid(Integer.valueOf(ds));
-			
-			String ss=(String)dataManager.getValueAt(i, 2);			
-			
+			String ss=(String)dataManager.getValueAt(i,1);						
 			comment.setUserid(Integer.valueOf(ss));
+			
+			String ds = dataManager.getValueAt(i,2).toString();
+			comment.setDiaryid(Integer.valueOf(ds));
 			
 			comment.setContent((String)dataManager.getValueAt(i, 3));
 						

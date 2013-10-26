@@ -34,15 +34,16 @@ public class TextDiaryManager extends DiaryManager {
 			String stext = "insert into `textlist`(`diaryid`,`text`) values ('"
 					+id+"', '"+ text+"');";
 			try {
+				dataManager.connectToDatabase();
 				dataManager.setUpdate(stext);
 				dataManager.disconnectFromDatabase();
 				return true;
-			} catch (IllegalStateException | SQLException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
 			}
 		}else{
-			String utext = "update `textlist` SET `text` = "+ text +"where diaryid = " +id+";";
+			String utext = "update `textlist` SET `text` = '"+ text +"' where diaryid = " +id+";";
 			try {
 				dataManager.setUpdate(utext);
 				dataManager.disconnectFromDatabase();
@@ -58,7 +59,7 @@ public class TextDiaryManager extends DiaryManager {
 	
 	public boolean deleteself(Diary diary){
 		int id = diary.getId();
-		String stext="delete from textlist where diaryid ="+id;
+		String stext="delete from textlist where diaryid = "+id;
 		try {
 			dataManager.connectToDatabase();
 			dataManager.setUpdate(stext);
@@ -108,33 +109,28 @@ public class TextDiaryManager extends DiaryManager {
 	}
 	
 	public ArrayList<Diary> searchByContent(String content, User self, boolean own){ 
-		String query="Select * from textlist where text like \"%"+ content +"%\"";
+		String query="Select * from diarylist NATURAL LEFT OUTER JOIN textlist where `text` like \"%"+ content +"%\"";
 		String listown=query+" and `userid`="+ self.getUserID();
 		String listshare = query + " and `shared` = 1 and `userid`<>"+ self.getUserID();
 		
 		ArrayList<Diary> diaryList = new ArrayList<Diary>();
 		try {
 			dataManager.connectToDatabase();
+			
 			if(own==true){
 				dataManager.setQuery(listown);
-				int numberOfRow= dataManager.getRowCount();
-				for(int i =0; i<numberOfRow; i++){
-					TextDiary diary = new TextDiary();
-					diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
-					diaryList.add(diary);
-				}
-				dataManager.disconnectFromDatabase();
+			
 			}else{
-				dataManager.setQuery(listshare);
-				int numberOfRow= dataManager.getRowCount();
-				for(int i =0; i<numberOfRow; i++){
-					TextDiary diary = new TextDiary();
-					diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
-					diaryList.add(diary);
-				}
-				dataManager.disconnectFromDatabase();
+				dataManager.setQuery(listshare);		
 			}
 			
+			int numberOfRow= dataManager.getRowCount();
+			for(int i = 0; i<numberOfRow; i++){
+				TextDiary diary = new TextDiary();
+				diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
+				diaryList.add(diary);
+			}
+			dataManager.disconnectFromDatabase();
 		} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 		}

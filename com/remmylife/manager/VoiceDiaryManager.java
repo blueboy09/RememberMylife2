@@ -8,10 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.remmylife.dbacess.DataManager;
-import com.remmylife.diary.Diary;
-import com.remmylife.diary.TextDiary;
-import com.remmylife.diary.User;
-import com.remmylife.diary.VoiceDiary;
+import com.remmylife.diary.*;
 
 public class VoiceDiaryManager extends DiaryManager {
 
@@ -50,11 +47,9 @@ public class VoiceDiaryManager extends DiaryManager {
 			
 			try{
 				java.sql.Connection con = DriverManager.getConnection(this.url,this.user,this.password);
-				java.sql.PreparedStatement pS = con.prepareStatement("insert into `voicelist`(id,note,voicedata) values ('"
+				java.sql.PreparedStatement pS = con.prepareStatement("insert into `voicelist`(diaryid,note,voicedata) values ('"
 						+ id +"', '"+ note +"', ?);");
 									
-				//File imgFile = new File("d:\\d.jpg");
-				//InputStream iS = new FileInputStream(imgFile);
 				InputStream iS= new ByteArrayInputStream(voice);
 				pS.setBinaryStream(1, iS,(int)(voice.length));
 				pS.executeUpdate();
@@ -67,17 +62,24 @@ public class VoiceDiaryManager extends DiaryManager {
 			
 
 		}else{
-			deleteself(diary);
+			//deleteself(diary);
 			try{
+
 				java.sql.Connection con = DriverManager.getConnection(this.url,this.user,this.password);
-				java.sql.PreparedStatement pS = con.prepareStatement("insert into `voicelist`(id,note,voicedata) values ('"
-						+ id +"', '"+ note +"', ?);");
-									
-				//File imgFile = new File("d:\\d.jpg");
-				//InputStream iS = new FileInputStream(imgFile);
-				InputStream iS= new ByteArrayInputStream(voice);
-				pS.setBinaryStream(1, iS,(int)(voice.length));
-				pS.executeUpdate();
+				String update;
+				if(voice!=null){
+					update="update `voicelist` SET `diaryid` ='"+id+"',`note`='"+note+"', `voicedata` = ?;";
+					java.sql.PreparedStatement pS = con.prepareStatement(update);
+					//java.sql.PreparedStatement pS = con.prepareStatement("insert into `voicelist`(id,note,voicedata) values ('"+ id +"', '"+ note +"', ?);");									
+					InputStream iS= new ByteArrayInputStream(voice);
+					pS.setBinaryStream(1, iS,(int)(voice.length));
+					pS.executeUpdate();
+				}else{
+					update="update `voicelist` SET `diaryid` ='"+id+"',`note`='"+note+"';";
+					java.sql.PreparedStatement pS = con.prepareStatement(update);
+					pS.executeUpdate();
+				}
+				
 				
 				return true;
 			}catch(SQLException e) {
@@ -135,8 +137,11 @@ public class VoiceDiaryManager extends DiaryManager {
 			
 			if(rS.next()){
 				java.sql.Blob blob = rS.getBlob("voicedata");
-				byte[]voice= blob.getBytes(1, (int) blob.length());
-				dataManager.disconnectFromDatabase();
+				byte[] voice=null;
+				if(blob!=null){
+					voice= blob.getBytes(1, (int) blob.length());
+					dataManager.disconnectFromDatabase();
+				}
 				return new VoiceDiary(diary,voice,note);
 			}else{
 				return null;
@@ -150,35 +155,29 @@ public class VoiceDiaryManager extends DiaryManager {
 	}
 	
 
-	
 	public ArrayList<Diary> searchByContent(String content, User self, boolean own){ 
-		String query="Select * from voicelist where `note` like \"%"+ content +"%\"";
+		String query="Select * from diarylist NATURAL LEFT OUTER JOIN voicelist where `note` like \"%"+ content +"%\"";
 		String listown=query+" and `userid`="+ self.getUserID();
 		String listshare = query + " and `shared` = 1 and `userid`<>"+ self.getUserID();
 		
 		ArrayList<Diary> diaryList = new ArrayList<Diary>();
 		try {
 			dataManager.connectToDatabase();
+			
 			if(own==true){
 				dataManager.setQuery(listown);
-				int numberOfRow= dataManager.getRowCount();
-				for(int i =0; i<numberOfRow; i++){
-					TextDiary diary = new TextDiary();
-					diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
-					diaryList.add(diary);
-				}
-				dataManager.disconnectFromDatabase();
+			
 			}else{
-				dataManager.setQuery(listshare);
-				int numberOfRow= dataManager.getRowCount();
-				for(int i =0; i<numberOfRow; i++){
-					TextDiary diary = new TextDiary();
-					diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
-					diaryList.add(diary);
-				}
-				dataManager.disconnectFromDatabase();
+				dataManager.setQuery(listshare);		
 			}
 			
+			int numberOfRow= dataManager.getRowCount();
+			for(int i = 0; i<numberOfRow; i++){
+				VoiceDiary diary = new VoiceDiary();
+				diary.setId(Integer.valueOf(dataManager.getValueAt(i, 0).toString()));
+				diaryList.add(diary);
+			}
+			dataManager.disconnectFromDatabase();
 		} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 		}
@@ -199,9 +198,11 @@ public class VoiceDiaryManager extends DiaryManager {
 				java.sql.PreparedStatement pS = con.prepareStatement("SELECT * FROM voicelist where id ="+diary.getId());
 				ResultSet rS = pS.executeQuery();
 				if(rS.next()){
-					java.sql.Blob blob2 = rS.getBlob("voicedata");
-					byte[]voice= blob2.getBytes(1, (int) blob2.length());
-					diaryList.add(new VoiceDiary(diary,voice,note));
+					java.sql.Blob blob = rS.getBlob("voicedata");
+					if(blob!=null){
+						byte[]voice= blob.getBytes(1, (int) blob.length());
+						diaryList.add(new VoiceDiary(diary,voice,note));
+					}
 				}
 				
 			} catch (IllegalStateException | SQLException e) {

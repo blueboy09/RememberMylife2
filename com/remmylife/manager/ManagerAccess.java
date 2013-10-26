@@ -96,33 +96,35 @@ public class ManagerAccess {
 	
 	// search
 	public ArrayList<Diary> searchByTitle(String title, User self, boolean own){
-		String listByTitle= "Select * from diarylist where title like \"%"+title +"%\"";
+		String title1 = diaryManager.dataManager.avoidAqlInjection(title);
+		String listByTitle= "Select * from diarylist where title like \"%"+title1 +"%\"";
 		return diaryManager.search(listByTitle, self, own);
 	}
 	
 	public ArrayList<Diary> searchByDate(Date date, User self, boolean own){ 
 		SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd");    
         String dateq = sDateFormat.format(date); 
-        String listByTime= "Select * from diarylist where date like \""+ dateq +"%\"";
+        String listByTime= "Select * from diarylist where createdate like \""+ dateq +"%\"";
 		return diaryManager.search(listByTime, self, own);
 	}
 	
 	public ArrayList<Diary> searchByType(DiaryType type, User self, boolean own){
 		String typeq = type.name();
-		String listByTitle= "Select * from diarylist where  `TYPE` ="+ typeq ;
+		String listByTitle= "Select * from diarylist where  `TYPE` ='"+ typeq +"' ";
 		return diaryManager.search(listByTitle, self, own);
 	}
 	
-	public ArrayList<Diary> sortByDate(Date date, User self, boolean own){
-		String listByTime= "SELECT * FROM diarylist ORDER BY date DESC ";
+	public ArrayList<Diary> sortByDate(User self, boolean own){
+		String listByTime= " ORDER BY createdate DESC ";
 		return diaryManager.sort(listByTime, self, own);
 	}
 	
 	public ArrayList<Diary> searchByContent(String content, User self, boolean own){
+		String content1 = diaryManager.dataManager.avoidAqlInjection(content);
 		ArrayList<Diary> diaryList = new ArrayList<Diary>();
-		diaryList.addAll(textDiaryManager.searchByContent(content, self, own));
-		diaryList.addAll(imageDiaryManager.searchByContent(content, self, own));
-		diaryList.addAll(voiceDiaryManager.searchByContent(content, self, own));
+		diaryList.addAll(textDiaryManager.searchByContent(content1, self, own));
+		diaryList.addAll(imageDiaryManager.searchByContent(content1, self, own));
+		diaryList.addAll(voiceDiaryManager.searchByContent(content1, self, own));
 		Diary diary = new Diary();
 		for (int i=0; i< diaryList.size();i++){
 			diary = diaryManager.getDiary(diaryList.get(i));
@@ -136,15 +138,11 @@ public class ManagerAccess {
 		}
 		
 		return diaryList;
-		
-	
-	
+
 	}
 
-
-
-
-
+	
+	
 }
 	
 

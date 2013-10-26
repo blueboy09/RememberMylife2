@@ -10,6 +10,12 @@ public class ImageDiary extends Diary
 	byte[] images = null;//图片的字节流
 	String note = null;//照片的注释
 	
+	
+	public ImageDiary() {
+		super();
+		this.setType(DiaryType.IMAGE_DIARY);
+	}
+
 	public ImageDiary(byte[] images, String note) {
 		super();
 		this.images = images;
@@ -28,6 +34,8 @@ public class ImageDiary extends Diary
 		this.images=images;
 		this.note = note;
 	}
+	
+	
 	
 	public ImageDiary(ImageDiary diary){
 		super(diary);

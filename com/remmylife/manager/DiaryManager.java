@@ -44,8 +44,8 @@ public class DiaryManager extends Manager{
 	}
 	
 	public ArrayList<Diary> sort(String query, User user, boolean own){
-		String listown=query+" where `userid`="+ user.getUserID();
-		String listshare = query + " where `shared` = 1 and `userid`<>"+ user.getUserID();		
+		String listown="SELECT * FROM diarylist  where `userid`= "+ user.getUserID()+ query;
+		String listshare = query + " where `shared` = 1 and `userid`<>"+ user.getUserID()+" ORDER BY date DESC ";		
 		if(own==true){
 			return execSqlQuery(listown);
 		}else{
@@ -92,7 +92,7 @@ public class DiaryManager extends Manager{
 
 	
 	public int getId(){
-		String cValue = "SELECT max(id) FROM diarylist";
+		String cValue = "SELECT max(diaryid) FROM diarylist";
 		try {
 			dataManager.connectToDatabase();
 		
@@ -136,8 +136,11 @@ public class DiaryManager extends Manager{
         String dateq2 = sDateFormat.format(lastSaveDate);
         
         String weather = diary.getWeather().name();
+        int shared = 0;
+        if(diary.isShared()){
+        	 shared = 1;
+        }
         
-        boolean shared =diary.isShared();
         
         if(id==0){
         	String savediary = "insert into `diarylist`(`userid`,`type`,`title`,`createdate`,`lastsavedate`,`weather`,`shared`) values ('"
@@ -151,8 +154,8 @@ public class DiaryManager extends Manager{
 			}
 		}else{
 			//update `diarylist` SET `userid` = userid, `type`=type, `title`= title, `createdate` = dateq1, `lastsavedate`= dateq2, `weather`=weather, `shared`=shared where `diaryid`=id;
-			String updatediary = "update `diarylist` SET `userid` ="+ userid +", `type`="+type+", `title`= "+title+""+", `createdate` ="
-			+dateq1 +",`lastsavedate`="+dateq2+",`weather`="+weather+", `shared`="+shared+"where `diaryid`= "+id+" ;";
+			String updatediary = "update `diarylist` SET `userid` ='"+ userid +"', `type`='"+type+"', `title`= '"+title+"', `createdate` ='"
+			+dateq1 +"',`lastsavedate`='"+dateq2+"',`weather`='"+weather+"', `shared`="+shared+" where `diaryid`= "+id+" ;";
         	try {
 				dataManager.setUpdate(updatediary);
 				dataManager.disconnectFromDatabase();
@@ -231,8 +234,8 @@ public class DiaryManager extends Manager{
 			
 			weatherq=(String)dataManager.getValueAt(i, 6);
 			diary.setWeather(Weather.valueOf(weatherq));
-			
-			String shared=(String)dataManager.getValueAt(i, 7);
+		
+			String shared=(String)dataManager.getValueAt(i, 7).toString();
 			diary.setShared(Boolean.valueOf(shared));
 			
 			DiaryList.add(new Diary(diary));//用不用新建一个class

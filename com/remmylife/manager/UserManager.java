@@ -67,8 +67,8 @@ public class UserManager extends Manager {
     			
 			try{
 				java.sql.Connection con = DriverManager.getConnection(super.url,super.user,super.password);
-				java.sql.PreparedStatement pS = con.prepareStatement("insert into `userlist`(uerName,password,nickName,sex,birthday,headPortraint) values ('"
-						 +"', '"+ userName +"', '"+password+"', '"+nickName+"', '"+sexq+ "', '"+dateq+"', ?);");
+				java.sql.PreparedStatement pS = con.prepareStatement("insert into `userlist`(userName,password,nickName,sex,birthday,headPortrait) values ('"
+						 +userName +"', '"+password+"', '"+nickName+"', '"+sexq+ "', '"+dateq+"', ?);");
 				InputStream iS= new ByteArrayInputStream(headportrait);
 				pS.setBinaryStream(1, iS,(int)(headportrait.length));
 				pS.executeUpdate();
@@ -79,14 +79,24 @@ public class UserManager extends Manager {
 				return false;
 			}
 		}else{
-			delete(user);
 			try{
 				java.sql.Connection con = DriverManager.getConnection(super.url,super.user,super.password);
-				java.sql.PreparedStatement pS = con.prepareStatement("insert into `userlist`(userid,uerName,password,nickName,sex,birthday,headPortraint) values ('"
-				+userid+"', '"+ userName +"', '"+password+"', '"+nickName+"', '"+sexq+ "', '"+dateq+"', ?);");
-				InputStream iS= new ByteArrayInputStream(headportrait);
-				pS.setBinaryStream(1, iS,(int)(headportrait.length));
-				pS.executeUpdate();
+				String update;
+				if(headportrait!=null){
+					update ="update `userlist` SET `userName`= '"+ userName+"', `password`= '"+ password+"', `nickName`= '"
+							+nickName+"', `sex`='"+ sexq+"',`birthday` ='"+dateq+"', `headPortrait` = ?;";                    
+					java.sql.PreparedStatement pS = con.prepareStatement(update);
+					//java.sql.PreparedStatement pS = con.prepareStatement("insert into `userlist`(userid,uerName,password,nickName,sex,birthday,headPortrait) values ('"+userid+"', '"+ userName +"', '"+password+"', '"+nickName+"', '"+sexq+ "', '"+dateq+"', ?);");
+					InputStream iS= new ByteArrayInputStream(headportrait);
+					pS.setBinaryStream(1, iS,(int)(headportrait.length));
+					pS.executeUpdate();					
+				}else{
+					update = "update `userlist` SET `userName`= '"+ userName+"', `password`= '"+ password+"', `nickName`= '"
+							+nickName+"', `sex`='"+ sexq+"',`birthday` ='"+dateq+"';";
+					java.sql.PreparedStatement pS = con.prepareStatement(update);
+					pS.executeUpdate();
+				}
+			
 				return true;
     				
 			}catch(Exception e){
@@ -115,7 +125,7 @@ public class UserManager extends Manager {
 	}
 	
 	public User getUser(User user){
-		String getlist = "Select * from UserList where `userid` = " + user.getUserID()+";";
+		String getlist = "Select * from UserList where `userid` = " + user.getUserID();
 		ArrayList<User> UserList = execSqlQuery(getlist);
 		return UserList.get(0);
 		
@@ -123,9 +133,9 @@ public class UserManager extends Manager {
 	}
 	
 	public boolean check(String username, String password){
-		String check = "Select * from USERLIST where `userName` = " +username+"and `password` = "+ password+";";
+		String check = "Select * from USERLIST where `userName` = '" +username+"' and `password` = '"+ password+"';";
 		ArrayList<User> UserList = execSqlQuery(check);
-		if(UserList.get(0)!= null){
+		if(UserList.get(0).getUserName()!= null){
 			return true;
 		}else{
 			return false;
@@ -134,7 +144,7 @@ public class UserManager extends Manager {
 	}
 	
 	public boolean check(String username){
-		String check = "Select * from USERLIST where `userName` = " +username+";";
+		String check = "Select * from USERLIST where `userName` = '" +username+"';";
 		ArrayList<User> UserList = execSqlQuery(check);
 		if(UserList.get(0)!= null){
 			return true;
@@ -193,14 +203,15 @@ public class UserManager extends Manager {
 		for(int i=0 ; i < UserList.size(); i++){
 			user =UserList.get(i);
 			try {
-				
 				java.sql.Connection con = DriverManager.getConnection(super.url,super.user,super.password);
 				java.sql.PreparedStatement pS = con.prepareStatement("SELECT * FROM userlist where userid ="+UserList.get(i).getUserID());
 				ResultSet rS = pS.executeQuery();
 				if(rS.next()){
 					java.sql.Blob blob = rS.getBlob("headPortrait");
-					headportrait= blob.getBytes(1, (int) blob.length());
-					UserList.get(i).setHeadportrait(headportrait);
+					if(blob!=null){
+						headportrait= blob.getBytes(1, (int) blob.length());
+						UserList.get(i).setHeadportrait(headportrait);
+					}
 				}
 				
 			} catch (IllegalStateException | SQLException e) {

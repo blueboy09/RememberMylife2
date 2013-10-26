@@ -15,6 +15,8 @@ public  class Manager {
 	public Manager() {
 		super();
 		dataManager = new DataManager();
+		dataManager.execSqlFile("initial.sql");
+		dataManager.setUrl(dataManager.getUrl()+"remembermylife");
 		this.driver = dataManager.getDriver();
 		this.url = dataManager.getUrl();
 		this.user = dataManager.getUser();
@@ -23,6 +25,9 @@ public  class Manager {
 
 	public Manager(String driver, String url, String user, String password) {
 		super();
+		dataManager = new DataManager();
+		dataManager.execSqlFile("initial.sql");
+		dataManager.setUrl(dataManager.getUrl()+"remembermylife");
 		this.driver = driver;
 		this.url = url;
 		this.user = user;
@@ -59,7 +64,8 @@ public  class Manager {
 	public  ArrayList execSqlQuery(String query){
 		return null;
 	}
-
+		
+	
 	public String getDriver() {
 		return driver;
 	}

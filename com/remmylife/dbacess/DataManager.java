@@ -108,6 +108,15 @@ public class DataManager {
 	   }
 	   
 	   public void execSqlFile(String filename){
+		   try {
+			this.connectToDatabase();
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		   String content=readSQL(filename);
 		   String[] commands =content.split(";");
 		   for(String s:commands){
@@ -119,6 +128,8 @@ public class DataManager {
 				e.printStackTrace();
 			}
 		   }
+		   
+		   this.disconnectFromDatabase();
 	   }
 	   
 	   public void disconnectFromDatabase()
@@ -268,6 +279,11 @@ public class DataManager {
 				return null;
 			}
 			  
+		}
+		
+		
+		public String avoidAqlInjection(String query){
+			return query.replace('"','_').replace('\'', '_').replace('`', '_');
 		}
 		
 		public String getDriver() {
