@@ -18,6 +18,7 @@ public class ImageDiary extends Diary
 
 	public ImageDiary(byte[] images, String note) {
 		super();
+		this.setType(DiaryType.IMAGE_DIARY);
 		this.images = images;
 		this.note = note;
 	}
@@ -31,6 +32,7 @@ public class ImageDiary extends Diary
 	
 	public ImageDiary(Diary diary,byte[]images,String note){
 		super(diary);
+		this.setType(DiaryType.IMAGE_DIARY);
 		this.images=images;
 		this.note = note;
 	}
