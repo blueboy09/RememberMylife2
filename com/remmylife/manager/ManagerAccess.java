@@ -27,7 +27,7 @@ public class ManagerAccess {
 	}
 	
 	public User getUser(User user){
-		if(userManager.signup(user)){
+		if(userManager.signin(user.getUserName(),user.getPassword())){
 			return userManager.getUser(user);
 		}else{
 			return null;
