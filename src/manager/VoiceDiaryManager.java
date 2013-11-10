@@ -34,7 +34,8 @@ public class VoiceDiaryManager extends DiaryManager {
 		
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -68,14 +69,14 @@ public class VoiceDiaryManager extends DiaryManager {
 				java.sql.Connection con = DriverManager.getConnection(this.url,this.user,this.password);
 				String update;
 				if(voice!=null){
-					update="update `voicelist` SET `diaryid` ='"+id+"',`note`='"+note+"', `voicedata` = ?;";
+					update="update `voicelist` SET `note`='"+note+"', `voicedata` = ?  where `diaryid` ='"+id+"'";
 					java.sql.PreparedStatement pS = con.prepareStatement(update);
 					//java.sql.PreparedStatement pS = con.prepareStatement("insert into `voicelist`(id,note,voicedata) values ('"+ id +"', '"+ note +"', ?);");									
 					InputStream iS= new ByteArrayInputStream(voice);
 					pS.setBinaryStream(1, iS,(int)(voice.length));
 					pS.executeUpdate();
 				}else{
-					update="update `voicelist` SET `diaryid` ='"+id+"',`note`='"+note+"';";
+					update="update `voicelist` SET `note`='"+note+"' where `diaryid` ='"+id+"'";
 					java.sql.PreparedStatement pS = con.prepareStatement(update);
 					pS.executeUpdate();
 				}
@@ -97,7 +98,8 @@ public class VoiceDiaryManager extends DiaryManager {
 			dataManager.setUpdate(del);
 			dataManager.disconnectFromDatabase();
 			return true;			
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -114,7 +116,8 @@ public class VoiceDiaryManager extends DiaryManager {
 			dataManager.setUpdate(del);
 			dataManager.disconnectFromDatabase();
 			return super.delete(diary);			
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -146,7 +149,8 @@ public class VoiceDiaryManager extends DiaryManager {
 			}else{
 				return null;
 			}
-		}catch(ClassNotFoundException | SQLException e){
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -178,8 +182,9 @@ public class VoiceDiaryManager extends DiaryManager {
 				diaryList.add(diary);
 			}
 			dataManager.disconnectFromDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
-				e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 			return diaryList;
 	}
@@ -205,7 +210,8 @@ public class VoiceDiaryManager extends DiaryManager {
 					}
 				}
 				
-			} catch (IllegalStateException | SQLException e) {
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

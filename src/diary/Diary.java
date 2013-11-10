@@ -157,7 +157,19 @@ public class Diary
 	public void setUserid(int userid) {
 		this.userid = userid;
 	}
-
-
+	
+	public String getTextContent()
+	{
+		switch(type)
+		 {
+		 case TEXT_DIARY:
+			 return ((TextDiary)(this)).getText();
+		 case VOICE_DIARY:
+			 return ((VoiceDiary)(this)).getNote();
+		 case IMAGE_DIARY:
+			 return ((ImageDiary)(this)).getNote();
+		 }
+		return "";
+	}
 
 }

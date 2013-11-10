@@ -27,7 +27,8 @@ public class ImageDiaryManager extends DiaryManager {
 		int id = diary.getId();
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -58,7 +59,7 @@ public class ImageDiaryManager extends DiaryManager {
 				String update;
 				if(images!=null){
 
-					update="update `imagelist` SET `diaryid` ='"+id+"',`note`='"+note+"', `imagedata` = ?;";
+					update="update `imagelist` SET `note`='"+note+"', `imagedata` = ? where `diaryid` ='"+id+"'";
 					java.sql.PreparedStatement pS = con.prepareStatement(update);
 					//java.sql.PreparedStatement pS = con.prepareStatement("insert into `imagelist`(id,note,imagedata) values ('"+ id +"', '"+ note +"', ?);");
 					InputStream iS= new ByteArrayInputStream(images);
@@ -66,7 +67,7 @@ public class ImageDiaryManager extends DiaryManager {
 					pS.executeUpdate();
 					return true;
 				}else{
-					update="update `imagelist` SET `diaryid` ='"+id+"',`note`='"+note+"';";
+					update="update `imagelist` SET `note`='"+note+"' where `diaryid` = '"+id+"'";
 					java.sql.PreparedStatement pS = con.prepareStatement(update);
 					pS.executeUpdate();
 					return true;
@@ -88,7 +89,8 @@ public class ImageDiaryManager extends DiaryManager {
 			dataManager.setUpdate(del);
 			dataManager.disconnectFromDatabase();
 			return true;
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -103,7 +105,8 @@ public class ImageDiaryManager extends DiaryManager {
 			dataManager.setUpdate(del);
 			dataManager.disconnectFromDatabase();
 			return super.delete(diary);			
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -135,7 +138,8 @@ public class ImageDiaryManager extends DiaryManager {
 			}else{
 				return null;
 			}
-		}catch(ClassNotFoundException | SQLException e){
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -166,8 +170,9 @@ public class ImageDiaryManager extends DiaryManager {
 				diaryList.add(diary);
 			}
 			dataManager.disconnectFromDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
-				e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 			return diaryList;
 	}
@@ -193,7 +198,8 @@ public class ImageDiaryManager extends DiaryManager {
 					}
 				}
 				
-			} catch (IllegalStateException | SQLException e) {
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

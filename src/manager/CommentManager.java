@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.swing.JOptionPane;
+
 import com.remmylife.dbacess.*;
 import com.remmylife.diary.*;
 
@@ -26,8 +28,7 @@ public class CommentManager extends Manager {
 	public boolean save(Comment comment){
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -38,23 +39,25 @@ public class CommentManager extends Manager {
 		//String savecomment2= "insert into `commentlist`(`commentid`,`diaryid`,`userid`,`content`) values ('"+commentid+"', '"+ diaryid+"', '" + userid +"', '"+content+");" ;
 		String savecomment="insert into `commentlist`(`userid`,`diaryid`,`content`) values ('"
 				+ userid+"', '" + diaryid +"', '"+content+"');" ;
-		String updatecomment = "update `commentlist` SET `userid` ="+ userid +", `diaryid`="+diaryid+", `content`= '"+content+"' ;";
+		String updatecomment = "update `commentlist` SET `userid` ="+ userid +", `diaryid`="+diaryid+", `content`= '"+content+"' where commentid = "+commentid;
         if(commentid==0){
         	try {
 				dataManager.setUpdate(savecomment);
 				dataManager.disconnectFromDatabase();
-			} catch (IllegalStateException | SQLException e) {
-				e.printStackTrace();
-				return false;
-			}
+        	} catch (Exception e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    			return false;
+    		}
 		}else{
         	try {
 				dataManager.setUpdate(updatecomment);
 				dataManager.disconnectFromDatabase();
-			} catch (IllegalStateException | SQLException e) {
-				e.printStackTrace();
-				return false;
-			}
+        	} catch (Exception e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    			return false;
+    		}
 		}
 		return true;
 		
@@ -68,7 +71,7 @@ public class CommentManager extends Manager {
 			dataManager.setUpdate(del);
 			dataManager.disconnectFromDatabase();
 			return true;
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
@@ -86,7 +89,7 @@ public class CommentManager extends Manager {
 	
 	public ArrayList<Comment> getCommentList(Diary diary){
 		int diaryid = diary.getId();
-		String getlist = "select * from Comment where diaryid =" +diaryid+";";
+		String getlist = "select * from commentlist where diaryid =" +diaryid+";";
 		return  execSqlQuery(getlist);
 		
 	}
@@ -96,7 +99,8 @@ public class CommentManager extends Manager {
 		ArrayList<Comment> commentList= new ArrayList<Comment>();
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int numberOfRow= dataManager.getRowCount();
@@ -104,7 +108,7 @@ public class CommentManager extends Manager {
 			String ts = dataManager.getValueAt(i,0).toString();
 			comment.setCommentid(Integer.valueOf(ts));
 
-			String ss=(String)dataManager.getValueAt(i,1);						
+			String ss=dataManager.getValueAt(i,1).toString();						
 			comment.setUserid(Integer.valueOf(ss));
 			
 			String ds = dataManager.getValueAt(i,2).toString();
@@ -124,7 +128,7 @@ public class CommentManager extends Manager {
 		try {
 			dataManager.connectToDatabase();
 			dataManager.setQuery(query);
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -132,5 +136,4 @@ public class CommentManager extends Manager {
 		dataManager.disconnectFromDatabase();
 		return commentList;
 	}
-	
 }

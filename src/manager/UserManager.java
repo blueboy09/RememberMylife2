@@ -44,7 +44,7 @@ public class UserManager extends Manager {
 	public boolean save(User user){
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
@@ -84,7 +84,7 @@ public class UserManager extends Manager {
 				String update;
 				if(headportrait!=null){
 					update ="update `userlist` SET `userName`= '"+ userName+"', `password`= '"+ password+"', `nickName`= '"
-							+nickName+"', `sex`='"+ sexq+"',`birthday` ='"+dateq+"', `headPortrait` = ?;";                    
+							+nickName+"', `sex`='"+ sexq+"',`birthday` ='"+dateq+"', `headPortrait` = ? where `userid`= "+userid;                    
 					java.sql.PreparedStatement pS = con.prepareStatement(update);
 					//java.sql.PreparedStatement pS = con.prepareStatement("insert into `userlist`(userid,uerName,password,nickName,sex,birthday,headPortrait) values ('"+userid+"', '"+ userName +"', '"+password+"', '"+nickName+"', '"+sexq+ "', '"+dateq+"', ?);");
 					InputStream iS= new ByteArrayInputStream(headportrait);
@@ -116,7 +116,7 @@ public class UserManager extends Manager {
 			dataManager.setUpdate(del);
 			dataManager.disconnectFromDatabase();
 			return true;
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
@@ -157,7 +157,7 @@ public class UserManager extends Manager {
 		try {
 			dataManager.connectToDatabase();
 			dataManager.setQuery(query);
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -171,7 +171,8 @@ public class UserManager extends Manager {
 		ArrayList<User> UserList= new ArrayList<User>();
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int numberOfRow= dataManager.getRowCount();
@@ -214,7 +215,8 @@ public class UserManager extends Manager {
 					}
 				}
 				
-			} catch (IllegalStateException | SQLException e) {
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

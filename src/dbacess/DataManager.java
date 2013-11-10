@@ -88,7 +88,6 @@ public class DataManager {
 	      // ensure database connection is available
 	      if ( !connectedToDatabase ) 
 	         throw new IllegalStateException( "Not Connected to Database" );
-
 	      // specify query and execute it
 	      statement.executeUpdate( query );
  

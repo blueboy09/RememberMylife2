@@ -23,7 +23,7 @@ public class TextDiaryManager extends DiaryManager {
 		super.save(diary);
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -48,7 +48,7 @@ public class TextDiaryManager extends DiaryManager {
 				dataManager.setUpdate(utext);
 				dataManager.disconnectFromDatabase();
 				return true;
-			} catch (IllegalStateException | SQLException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
 			}
@@ -65,7 +65,7 @@ public class TextDiaryManager extends DiaryManager {
 			dataManager.setUpdate(stext);
 			dataManager.disconnectFromDatabase();
 			return true;			
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -79,7 +79,7 @@ public class TextDiaryManager extends DiaryManager {
 			dataManager.setUpdate(stext);
 			dataManager.disconnectFromDatabase();
 			return super.delete(diary);			
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -98,8 +98,7 @@ public class TextDiaryManager extends DiaryManager {
 			String text = (String)dataManager.getValueAt(0, 1);
 			dataManager.disconnectFromDatabase();
 			return new TextDiary(diary,text);
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -131,8 +130,8 @@ public class TextDiaryManager extends DiaryManager {
 				diaryList.add(diary);
 			}
 			dataManager.disconnectFromDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
-				e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 			return diaryList;
 	}
@@ -149,8 +148,7 @@ public class TextDiaryManager extends DiaryManager {
 			Diary diary =diaryListOrigin.get(i);
 			try {
 				dataManager.setQuery("SELECT * FROM textlist where diaryid="+diary.getId());
-			} catch (IllegalStateException | SQLException e) {
-				// TODO Auto-generated catch block
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			String text = (String)dataManager.getValueAt(0, 1);

@@ -34,7 +34,7 @@ public class DiaryManager extends Manager{
 	}
 	
 	public ArrayList<Diary> search(String query, User user, boolean own){
-		String listown=query+" and `userid`="+ user.getUserID();
+		String listown=query+" and `userid`= "+ user.getUserID();
 		String listshare = query + " and `shared` = 1 and `userid`<>"+ user.getUserID();
 		if(own==true){
 			return execSqlQuery(listown);
@@ -67,9 +67,8 @@ public class DiaryManager extends Manager{
 				dataManager.connectToDatabase();
 				dataManager.setUpdate(shared);
 				dataManager.disconnectFromDatabase();
-			} catch (IllegalStateException | SQLException |ClassNotFoundException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("can not be shared");
 			}
 
 		}
@@ -82,14 +81,12 @@ public class DiaryManager extends Manager{
 				dataManager.connectToDatabase();
 				dataManager.setUpdate(unshared);
 				dataManager.disconnectFromDatabase();
-			} catch (IllegalStateException | SQLException |ClassNotFoundException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("can not be unshared");
 			}
 
 		}
 	}
-
 	
 	public int getId(){
 		String cValue = "SELECT max(diaryid) FROM diarylist";
@@ -105,8 +102,7 @@ public class DiaryManager extends Manager{
 			}
 			dataManager.disconnectFromDatabase();
 			return count;
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
 		}
@@ -116,8 +112,7 @@ public class DiaryManager extends Manager{
 	public boolean save(Diary diary) {
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -148,10 +143,10 @@ public class DiaryManager extends Manager{
         	try {
 				dataManager.setUpdate(savediary);
 				dataManager.disconnectFromDatabase();
-			} catch (IllegalStateException | SQLException e) {
-				e.printStackTrace();
-				return false;
-			}
+        	} catch (Exception e) {
+    			e.printStackTrace();
+    			return false;
+    		}
 		}else{
 			//update `diarylist` SET `userid` = userid, `type`=type, `title`= title, `createdate` = dateq1, `lastsavedate`= dateq2, `weather`=weather, `shared`=shared where `diaryid`=id;
 			String updatediary = "update `diarylist` SET `userid` ='"+ userid +"', `type`='"+type+"', `title`= '"+title+"', `createdate` ='"
@@ -159,10 +154,10 @@ public class DiaryManager extends Manager{
         	try {
 				dataManager.setUpdate(updatediary);
 				dataManager.disconnectFromDatabase();
-			} catch (IllegalStateException | SQLException e) {
-				e.printStackTrace();
-				return false;
-			}
+        	} catch (Exception e) {
+    			e.printStackTrace();
+    			return false;
+    		}
 		}
 		return true;
 	}
@@ -176,8 +171,7 @@ public class DiaryManager extends Manager{
 			dataManager.setUpdate(del);
 			dataManager.disconnectFromDatabase();
 			return true;
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -199,7 +193,7 @@ public class DiaryManager extends Manager{
 		ArrayList<Diary> DiaryList= new ArrayList<Diary>();
 		try {
 			dataManager.connectToDatabase();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		int numberOfRow= dataManager.getRowCount();
@@ -230,8 +224,8 @@ public class DiaryManager extends Manager{
 			
 			lastSaveDateq=(String)dataManager.getValueAt(i, 5);
 			pos = new ParsePosition(0);
-			diary.setCreateDate(sDateFormat.parse(lastSaveDateq, pos)) ;
-			
+			diary.setLastSaveDate(sDateFormat.parse(lastSaveDateq, pos)) ;
+		
 			weatherq=(String)dataManager.getValueAt(i, 6);
 			diary.setWeather(Weather.valueOf(weatherq));
 		
@@ -248,8 +242,7 @@ public class DiaryManager extends Manager{
 		try {
 			dataManager.connectToDatabase();
 			dataManager.setQuery(query);
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		ArrayList<Diary> DiaryList = constructList(dataManager);
